@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAN Protocol Mastery - Automotive Communication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --code-bg: #2d2d2d;
+            --card-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary), #1a2530);
+            color: white;
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.2rem;
+            color: var(--secondary);
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        nav a:hover, nav a.active {
+            color: var(--secondary);
+            background: rgba(255,255,255,0.1);
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        
+        nav a:hover::after, nav a.active::after {
+            width: 100%;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(44, 62, 80, 0.9), rgba(44, 62, 80, 0.9)), 
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%232c3e50"/><path d="M0 0L100 100M100 0L0 100" stroke="%233498db" stroke-width="1"/></svg>');
+            background-size: cover;
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid var(--secondary);
+        }
+        
+        .btn:hover {
+            background: transparent;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            margin-left: 15px;
+        }
+        
+        .btn-outline:hover {
+            background: var(--secondary);
+        }
+        
+        section {
+            padding: 5rem 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .section-header p {
+            font-size: 1.2rem;
+            color: #555;
+            max-width: 700px;
+            margin: 1.5rem auto 0;
+        }
+        
+        .features {
+            background: white;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid var(--secondary);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            background: var(--primary);
+            color: white;
+            font-size: 2.5rem;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .feature-content {
+            padding: 25px;
+        }
+        
+        .feature-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .feature-content p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+        
+        .feature-content ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .feature-content li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .feature-content li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .interview-section {
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+        }
+        
+        .qa-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .qa-item {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .qa-item:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .question {
+            padding: 20px 25px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .answer {
+            padding: 0 25px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+        
+        .answer-content {
+            padding: 25px 0;
+        }
+        
+        .answer-content p {
+            margin-bottom: 15px;
+        }
+        
+        .code-block {
+            background: var(--code-bg);
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-family: 'Source Code Pro', monospace;
+            overflow-x: auto;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .code-copy {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .code-copy:hover {
+            color: var(--secondary);
+        }
+        
+        .diagram {
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .diagram img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .diagram-placeholder {
+            height: 300px;
+            background: linear-gradient(45deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%);
+            background-size: 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: var(--card-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .implementation {
+            background: white;
+        }
+        
+        .implementation-content {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            margin-top: 40px;
+        }
+        
+        .implementation-text {
+            flex: 1;
+        }
+        
+        .implementation-image {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .implementation-steps {
+            margin-top: 30px;
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 25px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* About Section Styling */
+        .about-section {
+            background: linear-gradient(to bottom, #e9ecef, #dbe4ee);
+            padding: 5rem 0;
+        }
+        
+        .about-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .about-header {
+            margin-bottom: 30px;
+            color: var(--primary);
+        }
+        
+        .about-header h2 {
+            font-size: 2.3rem;
+            margin-bottom: 15px;
+        }
+        
+        .about-header p {
+            font-size: 1.1rem;
+            color: #555;
+        }
+        
+        .profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--secondary), #2c3e50);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .profile-icon i {
+            font-size: 3.5rem;
+            color: white;
+        }
+        
+        .profile h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .profile p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .contact-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .contact-link:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .contact-link i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 4rem 0 2rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #aaa;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+            
+            .btn-container {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                margin: 0;
+            }
+            
+            .implementation-content {
+                flex-direction: column;
+            }
+            
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-network-wired"></i>
+                    <h1>CAN Protocol Mastery</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#fundamentals" class="active">Fundamentals</a></li>
+                        <li><a href="#interview">Interview Q&A</a></li>
+                        <li><a href="#implementation">STM32 Implementation</a></li>
+                        <li><a href="#about">About Me</a></li>
+                        <li><a href="#resources">Resources</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Master the CAN Protocol</h2>
+                <p>Comprehensive guide to Controller Area Network protocol - from automotive fundamentals to STM32 implementation and interview preparation</p>
+                <div class="btn-container">
+                    <a href="#fundamentals" class="btn">Explore Fundamentals</a>
+                    <a href="#interview" class="btn btn-outline">Interview Questions</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fundamentals Section -->
+    <section id="fundamentals" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>CAN Protocol Fundamentals</h2>
+                <p>Essential concepts and technical details of the Controller Area Network</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Introduction & History</h3>
+                        <p>Developed by Bosch in the 1980s for automotive applications</p>
+                        <ul>
+                            <li>1983: First CAN project at Bosch</li>
+                            <li>1986: CAN protocol introduced</li>
+                            <li>1991: CAN 2.0A specification</li>
+                            <li>1993: ISO 11898 standard</li>
+                            <li>Today: Used in 99% of modern vehicles</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Key Features</h3>
+                        <p>Why CAN is the backbone of automotive communication</p>
+                        <ul>
+                            <li>Multi-master architecture</li>
+                            <li>1 Mbps max speed (500kbps typical)</li>
+                            <li>Robust error detection & handling</li>
+                            <li>Differential signaling for noise immunity</li>
+                            <li>Priority-based arbitration</li>
+                            <li>Low cost implementation</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-wave-square"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Electrical Signaling</h3>
+                        <p>Differential voltage for noise immunity</p>
+                        <div class="comparison-table">
+                            <table>
+                                <tr>
+                                    <th>State</th>
+                                    <th>CAN_H</th>
+                                    <th>CAN_L</th>
+                                    <th>Differential Voltage</th>
+                                </tr>
+                                <tr>
+                                    <td>Dominant (0)</td>
+                                    <td>3.5V</td>
+                                    <td>1.5V</td>
+                                    <td>2V</td>
+                                </tr>
+                                <tr>
+                                    <td>Recessive (1)</td>
+                                    <td>2.5V</td>
+                                    <td>2.5V</td>
+                                    <td>0V</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Frame Formats</h3>
+                        <p>Message structures in CAN communication</p>
+                        <ul>
+                            <li><strong>Data Frame</strong>: Transmits actual data (0-8 bytes)</li>
+                            <li><strong>Remote Frame</strong>: Requests data transmission</li>
+                            <li><strong>Error Frame</strong>: Signals detected errors</li>
+                            <li><strong>Overload Frame</strong>: Introduces delay between frames</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Error Handling</h3>
+                        <p>Robust error detection and confinement</p>
+                        <ul>
+                            <li><strong>Error States</strong>: Active, Passive, Bus Off</li>
+                            <li><strong>Error Counters</strong>: TEC (Transmit), REC (Receive)</li>
+                            <li>Automatic retransmission</li>
+                            <li>Faulty node disconnection</li>
+                            <li>Error types: CRC, ACK, Bit, Stuffing</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-stopwatch"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Bit Timing</h3>
+                        <p>Configuring communication speed</p>
+                        <p>Bit time = 1 / Baud rate</p>
+                        <p>Segments:</p>
+                        <ul>
+                            <li>Sync_Seg: 1 time quantum (fixed)</li>
+                            <li>Prop_Seg: Compensates signal delay</li>
+                            <li>Phase_Seg1/2: Resynchronization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interview Q&A Section -->
+    <section id="interview" class="interview-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Interview Questions & Answers</h2>
+                <p>Common CAN protocol questions with detailed explanations</p>
+            </div>
+            
+            <div class="qa-container">
+                <div class="qa-item">
+                    <div class="question">
+                        Explain CAN's non-destructive bit-wise arbitration
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-content">
+                            <p><strong>Mechanism</strong>: Nodes transmit dominant (0) and recessive (1) bits simultaneously. If a node transmits recessive but reads dominant, it loses arbitration and stops transmitting immediately.</p>
+                            <p><strong>Priority Handling</strong>: Lower 11/29-bit IDs win (e.g., ID 0x100 beats 0x200 since MSB 0 > 1).</p>
+                            <p><strong>Criticality</strong>: Prevents data collisions without time loss (unlike Ethernet CSMA/CD). Ensures high-priority messages (e.g., braking) access the bus first.</p>
+                            <div class="diagram">
+                                <div class="diagram-placeholder">
+                                    CAN Bus Arbitration Diagram
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">
+                        Describe CAN's error confinement states
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-content">
+                            <div class="comparison-table">
+                                <table>
+                                    <tr>
+                                        <th>State</th>
+                                        <th>Condition</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Error Active</strong></td>
+                                        <td>TEC/REC &lt; 128</td>
+                                        <td>Sends active error flags (6 dominant 0s)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Error Passive</strong></td>
+                                        <td>TEC or REC ≥ 128</td>
+                                        <td>Sends passive error flags (6 recessive 1s)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Bus Off</strong></td>
+                                        <td>TEC > 255</td>
+                                        <td>Disconnects from bus</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <p><strong>Counter Rules</strong>:</p>
+                            <ul>
+                                <li><strong>TEC (Transmit Error Counter)</strong>: +8 for transmission errors (e.g., ACK error). +1 for passive/active error flag transmission.</li>
+                                <li><strong>REC (Receive Error Counter)</strong>: +1 for detected errors during reception. +8 for passive/active error flag reception.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">
+                        Compare Standard vs. Extended CAN frames
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-content">
+                            <div class="comparison-table">
+                                <table>
+                                    <tr>
+                                        <th>Feature</th>
+                                        <th>Standard Frame</th>
+                                        <th>Extended Frame</th>
+                                    </tr>
+                                    <tr>
+                                        <td>ID Length</td>
+                                        <td>11-bit</td>
+                                        <td>29-bit (11-base + 18-ext)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>IDE Bit</td>
+                                        <td>Dominant (0)</td>
+                                        <td>Recessive (1)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Compatibility</td>
+                                        <td>Supported by all</td>
+                                        <td>2.0B controllers only</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <p><strong>IDE Bit Role</strong>: IDE transmitted after 11-bit ID. If a 2.0A node sees recessive IDE (illegal), it generates an error. Ensures backward compatibility: 2.0B nodes handle both frames.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">
+                        How to configure bxCAN filters to accept only remote frames with ID 0x65D?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-content">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>STM32 HAL Configuration</span>
+                                    <span class="code-copy">Copy <i class="far fa-copy"></i></span>
+                                </div>
+                                <pre>CAN_FilterTypeDef filter;
+filter.FilterIdHigh = (0x65D &lt;&lt; 5) | (CAN_ID_STD &lt;&lt; 2); // 11-bit ID
+filter.FilterMaskIdHigh = 0x7FF &lt;&lt; 5; // Exact ID match
+filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+filter.FilterMode = CAN_FILTERMODE_IDMASK;
+filter.FilterScale = CAN_FILTERSCALE_32BIT;
+filter.FilterActivation = ENABLE;
+HAL_CAN_ConfigFilter(&hcan, &filter);</pre>
+                            </div>
+                            <p><strong>Critical Settings</strong>:</p>
+                            <ul>
+                                <li><code>FilterMaskIdHigh</code>: Set IDE/RTR bits to 1 (recessive) for remote frames</li>
+                                <li><code>FilterIdHigh</code>: RTR = 1 (bit 1) + IDE = 0 (bit 2) for standard remote frame</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">
+                        Calculate TSEG1/TSEG2 for 250kbps with 40MHz clock, prescaler=8, 75% sample point
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-content">
+                            <p><strong>Calculation Steps</strong>:</p>
+                            <ol>
+                                <li>CAN Clock: 40MHz / 8 = 5MHz</li>
+                                <li>Time Quantum (tq): 1 / 5MHz = 200ns</li>
+                                <li>Bit Time: 1 / 250kbps = 4μs</li>
+                                <li>Total tq: 4μs / 200ns = 20 tq</li>
+                                <li>Segments:
+                                    <ul>
+                                        <li>Sync_Seg = 1 tq (fixed)</li>
+                                        <li>Prop_Seg + Phase_Seg1 = 15 tq (75% of 20 tq)</li>
+                                        <li>Phase_Seg2 = 20 - 1 - 15 = 4 tq</li>
+                                        <li>TSEG1 = Prop_Seg + Phase_Seg1 = 15 tq</li>
+                                        <li>TSEG2 = Phase_Seg2 = 4 tq</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STM32 Implementation Section -->
+    <section id="implementation" class="implementation">
+        <div class="container">
+            <div class="section-header">
+                <h2>STM32 bxCAN Implementation</h2>
+                <p>Practical guide to using CAN on STM32 microcontrollers</p>
+            </div>
+            
+            <div class="implementation-content">
+                <div class="implementation-text">
+                    <h3>STM32 bxCAN Features</h3>
+                    <ul>
+                        <li>Supports CAN protocol version 2.0 A/B</li>
+                        <li>Bit rates up to 1 Mbit/s</li>
+                        <li>Three transmit mailboxes</li>
+                        <li>Two receive FIFOs with three stages each</li>
+                        <li>28 filter banks shared between CAN1 and CAN2</li>
+                        <li>Master/slave configuration for dual CAN</li>
+                    </ul>
+                    
+                    <div class="implementation-steps">
+                        <h3>Transmission Workflow</h3>
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div>
+                                <h4>Select Empty Mailbox</h4>
+                                <p>Application selects an empty transmit mailbox</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div>
+                                <h4>Configure Message</h4>
+                                <p>Set identifier, DLC (data length code), and data</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div>
+                                <h4>Request Transmission</h4>
+                                <p>Set TXRQ bit in control register</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div>
+                                <h4>Scheduler Priority</h4>
+                                <p>Mailbox waits to become highest priority</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div>
+                                <h4>Bus Transmission</h4>
+                                <p>Message transmits when bus is idle</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="implementation-image">
+                    <h3>bxCAN Block Diagram</h3>
+                    <div class="diagram">
+                        <div class="diagram-placeholder">
+                            STM32 bxCAN Architecture Diagram
+                        </div>
+                    </div>
+                    
+                    <h3>Operating Modes</h3>
+                    <ul>
+                        <li><strong>Normal Mode</strong>: Regular communication</li>
+                        <li><strong>Loopback Mode</strong>: Self-test (TX internally looped to RX)</li>
+                        <li><strong>Silent Mode</strong>: Monitor bus without transmitting</li>
+                        <li><strong>Combined Modes</strong>: Silent + Loopback for internal testing</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="code-block" style="margin-top: 40px;">
+                <div class="code-header">
+                    <span>Transmitting a CAN Message</span>
+                    <span class="code-copy">Copy <i class="far fa-copy"></i></span>
+                </div>
+                <pre>CAN_TxHeaderTypeDef TxHeader;
+uint8_t TxData[8];
+uint32_t TxMailbox;
+
+TxHeader.StdId = 0x123;            // Standard identifier
+TxHeader.ExtId = 0x00;              // Extended identifier (not used)
+TxHeader.IDE = CAN_ID_STD;          // Standard ID type
+TxHeader.RTR = CAN_RTR_DATA;        // Data frame
+TxHeader.DLC = 8;                   // Data length (8 bytes)
+TxHeader.TransmitGlobalTime = DISABLE;
+
+// Prepare data
+TxData[0] = 0x01;
+TxData[1] = 0x02;
+// ... fill all 8 bytes
+
+// Add to transmit mailbox
+if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
+    // Error handling
+}</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-card">
+                <div class="about-header">
+                    <h2>About This Project</h2>
+                    <p>Created by Vikram Lendave to share knowledge about automotive communication systems</p>
+                </div>
+                
+                <div class="profile">
+                    <div class="profile-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>Vikram Lendave</h3>
+                    <p>Embedded Systems Engineer | Automotive Specialist</p>
+                </div>
+                
+                <div class="contact-links">
+                    <a href="https://www.linkedin.com/in/vikram-lendave-aa8231267/" class="contact-link" target="_blank">
+                        <i class="fab fa-linkedin-in"></i> LinkedIn
+                    </a>
+                    <a href="https://github.com/Vikramlendave02" class="contact-link" target="_blank">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                    <a href="mailto:vikramlendave80@gmail.com" class="contact-link">
+                        <i class="fas fa-envelope"></i> Email
+                    </a>
+                </div>
+                
+                <p style="margin-top: 30px; line-height: 1.7; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    This educational resource was developed to provide comprehensive information about the CAN protocol, 
+                    from fundamental concepts to practical STM32 implementations. As an embedded systems engineer 
+                    specializing in automotive communication, I created this site to help others master this critical 
+                    technology.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="resources">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-file-pdf"></i> CAN Protocol Specification</a></li>
+                        <li><a href="#"><i class="fas fa-book"></i> STM32 CAN Application Note</a></li>
+                        <li><a href="#"><i class="fas fa-code"></i> GitHub Repository</a></li>
+                        <li><a href="#"><i class="fas fa-video"></i> Tutorial Videos</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#fundamentals"><i class="fas fa-arrow-right"></i> Fundamentals</a></li>
+                        <li><a href="#interview"><i class="fas fa-arrow-right"></i> Interview Q&A</a></li>
+                        <li><a href="#implementation"><i class="fas fa-arrow-right"></i> STM32 Implementation</a></li>
+                        <li><a href="#about"><i class="fas fa-arrow-right"></i> About Me</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Vikram</h3>
+                    <ul class="footer-links">
+                        <li><a href="mailto:vikramlendave80@gmail.com"><i class="fas fa-envelope"></i> vikramlendave80@gmail.com</a></li>
+                        <li><a href="https://github.com/Vikramlendave02" target="_blank"><i class="fab fa-github"></i> GitHub</a></li>
+                        <li><a href="https://www.linkedin.com/in/vikram-lendave-aa8231267/" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 Vikram Lendave. All rights reserved. Educational content based on Bosch CAN Specification 2.0 and STM32 documentation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle Q&A items
+        document.querySelectorAll('.question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const isOpen = answer.style.maxHeight !== '0px' && answer.style.maxHeight !== '';
+                
+                // Close all answers
+                document.querySelectorAll('.answer').forEach(ans => {
+                    ans.style.maxHeight = '0';
+                    ans.style.padding = '0 25px';
+                });
+                
+                // Reset all icons
+                document.querySelectorAll('.question i').forEach(icon => {
+                    icon.className = 'fas fa-chevron-down';
+                });
+                
+                // Toggle current answer
+                if (!isOpen) {
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    answer.style.padding = '0 25px';
+                    question.querySelector('i').className = 'fas fa-chevron-up';
+                }
+            });
+        });
+        
+        // Copy code functionality
+        document.querySelectorAll('.code-copy').forEach(button => {
+            button.addEventListener('click', () => {
+                const codeBlock = button.closest('.code-block').querySelector('pre');
+                const textArea = document.createElement('textarea');
+                textArea.value = codeBlock.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Visual feedback
+                const originalText = button.innerHTML;
+                button.innerHTML = 'Copied! <i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+        
+        // Smooth scrolling for navigation
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+                
+                // Update active class
+                document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Highlight active section in navigation
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav a');
+            
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
